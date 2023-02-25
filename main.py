@@ -1,6 +1,11 @@
+import asyncio
 import os
 import shutil
 import json
+import threading
+import multiprocessing
+import time
+from random import randint
 
 from kivymd.app import MDApp
 from kivy.lang import Builder
@@ -8,9 +13,17 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
 
 from kivymd.uix.filemanager import MDFileManager
-
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.list import TwoLineListItem
+from kivymd.uix.tab import MDTabsBase
 
 Window.size = (300, 608)
+
+
+class Tab(MDFloatLayout, MDTabsBase):
+    """Class implementing content for a tab."""
+    def __init__(self, **kwargs):
+        super(Tab, self).__init__(**kwargs)
 
 
 class MainWindow(Screen):
@@ -28,7 +41,7 @@ class CreateProfileForm(Screen):
 class WindowManager(ScreenManager):
 
     prof_info = {
-        'photo': 'static/images/add_photo.jpg',
+        'photo': 'static/images/incognito.png',
         'name': 'none',
         'surname': 'none',
         'lastname': 'none',
@@ -41,12 +54,42 @@ class WindowManager(ScreenManager):
 
     index = 0
 
-    def create_profile(self):
-        # receiving and updating index
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Window.bind(on_keyboard=self.events)
+        self.manager_open = False
+        self.file_manager = MDFileManager(
+            exit_manager=self.exit_manager,
+            select_path=self.select_path,
+            preview=True,
+        )
+        self.index = self.__get_index()
+        # self.update_list()  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    def create_list_widget(self, text, secondary_text):
+        print(9)
+        w = TwoLineListItem(text=text, secondary_text=secondary_text)
+        self.ids.main_profiles.add_widget(w)
+
+    def update_list(self):
+        for i in range(self.index):
+            with open(f'data/profiles/{i}/prof.json', 'r', encoding='utf-8') as prof:
+                prof.seek(0)
+                d = json.load(prof)
+                text = d['name'] + " " + d['surname'] + " " + d['lastname']
+                secondary_text = d['age'] + " " + "работает" if d['is_working'] else "не работает"
+                self.create_list_widget(text, secondary_text)
+
+
+    def __get_index(self):
         with open('data/info.txt', 'r+', encoding='utf-8') as info:
-            self.index = int(info.read())
-            info.seek(0)
+            return int(info.read())
+
+    def __set_index(self):
+        with open('data/info.txt', 'r+', encoding='utf-8') as info:
             info.write(f'{self.index + 1}')
+
+    def create_profile(self):
         # dir create
         if not os.path.exists(f'data/profiles/{self.index}'):
             os.makedirs(f'data/profiles/{self.index}')
@@ -60,19 +103,10 @@ class WindowManager(ScreenManager):
         # text info adding
         with open(f'data/profiles/{self.index}/prof.json', 'w+', encoding='utf-8') as prof:
             json.dump(self.prof_info, prof)
-            prof.seek(0)
-            d = json.load(prof)
-            print(d)
+        self.__set_index()
+        self.index = self.__get_index()
+        self.update_list()
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        Window.bind(on_keyboard=self.events)
-        self.manager_open = False
-        self.file_manager = MDFileManager(
-            exit_manager=self.exit_manager,
-            select_path=self.select_path,
-            preview=True,
-        )
 
     def file_manager_open(self):
         self.file_manager.show('C:/Users/gasim/Downloads')  # output manager to the screen
@@ -104,7 +138,6 @@ class WindowManager(ScreenManager):
             if self.manager_open:
                 self.file_manager.back()
         return True
-
 
 class MainApp(MDApp):
     def build(self):

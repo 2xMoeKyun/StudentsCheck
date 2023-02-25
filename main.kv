@@ -1,4 +1,41 @@
 WindowManager:
+    current: "main"
+    MainWindow:
+        id: main
+        Panel:
+            LogoBtn:
+
+            PlusBtn:
+                on_release: root.current = 'form'
+        ProfilesScroll:
+            id: main_pr
+            Profiles:
+                id: main_profiles
+    ProfileWindow:
+        MDIconButton:
+            icon: "reply"
+            pos_hint: {"top": 1}
+            ripple: 0
+            on_release: root.current = 'main'
+        MDSmartTile:
+            pos_hint: {'top':0.95, 'center_x': 0.5}
+            radius: 15
+            box_radius: [15, 15, 15, 15]
+#            source: "samolet.webp"
+            size_hint: 0.5, 0.25
+
+        MDTabs:
+            pos_hint: {'top':0.68, 'center_x': 0.5}
+            Tab:
+                title: "aaaaa"
+
+            Tab:
+                title: "aaaaa"
+
+
+
+
+
     CreateProfileForm:
         GoBackBtn:
             on_release: root.current = 'main'
@@ -96,31 +133,10 @@ WindowManager:
                     anchor_y: 'center'
                     MDRectangleFlatButton:
                         pos_hint_x: 0.5
-                        text: "MDRECTANGLEFLATBUTTON"
+                        text: "Добавить"
                         text_color: 0, 0, 1, 1
                         md_bg_color: 1, 1, 1, 1
                         on_release: root.create_profile()
-    MainWindow:
-        Panel:
-            LogoBtn:
-            PlusBtn:
-                on_release: root.current = 'form'
-        ProfilesScroll:
-            Profiles:
-                TwoLineListItem:
-                    text: 'vjufdinvujnfdvdfi1'
-                    secondary_text: "Secondary text here"
-                TwoLineListItem:
-                    text: 'vjufdinvujnfdvdfi1'
-                TwoLineListItem:
-                    text: 'vjufdinvujnfdvdfi1'
-                    secondary_text: "Secondary text here"
-
-    ProfileWindow:
-
-
-
-
 
 
 #Screen
@@ -142,6 +158,21 @@ WindowManager:
 
 <CreateProfileForm>:
     name: "form"
+
+
+<Tab>
+    MDScrollView:
+
+        size_hint_x: 0.8
+        do_scroll_x: False
+        do_scroll_y:
+        GridLayout:
+            cols: 1
+            size_hint: (1, None)
+            Button:
+                text: "dsadasw"
+            Button:
+                text: "dsadasw"
 
 
 #Panel widgets
@@ -180,7 +211,7 @@ WindowManager:
     pos_hint: {"x": 0.19}
 
 <Profiles@MDList>:
-    id: profiles
+    id: main_profiles
     padding: 10
     spacing: 10
     size_hint: 0.7, None
