@@ -11,6 +11,7 @@ from random import randint
 
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -25,7 +26,7 @@ from kivymd.uix.tab import MDTabsBase, MDTabs
 # from android.storage import app_storage_path
 # settings_path = app_storage_path()
 
-
+from kivymd.uix.textfield import MDTextField
 
 Window.size = (300, 608)
 
@@ -40,6 +41,7 @@ class Tab(MDFloatLayout, MDTabsBase):
         self.main_widget = GridLayout(cols=1, size_hint_y=0.4)
         al.add_widget(self.main_widget)
         self.add_widget(al)
+
 
     def add_label(self, text):
         label = MDLabel(font_style='H5', size_hint=(1,0.1), text=text)
@@ -71,7 +73,6 @@ class WindowManager(ScreenManager):
         'position': 'none',
         'phone': 'none',
     }
-    index = 0
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -83,6 +84,7 @@ class WindowManager(ScreenManager):
             preview=True,
         )
         self.index = self.__get_index()
+
 
     def __exit(self):
         sys.exit()
@@ -111,8 +113,9 @@ class WindowManager(ScreenManager):
             tab.add_label(text)
         self.ids.profile_mdtabs.add_widget(tab)
 
-    # def clear_tabs(self):
-    #     self.ids.profile.remove_widget(self.ids.profile_mdtabs)
+    def clear_tabs(self):
+        for x in self.ids.profile_mdtabs.get_tab_list():
+            self.ids.profile_mdtabs.remove_widget(x)
 
     def update_list(self):
         for i in range(len(self.ids.main_profiles.children), self.index):
